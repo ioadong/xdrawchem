@@ -7,6 +7,7 @@
 extern QString RingDir, HomeDir;
 
 const QString VERSION = QString::fromLatin1("1.10.2");
+extern const QString XDC_SERVER;
 
 // version string (makes updates easier :)
 #ifdef UNIX
@@ -36,7 +37,7 @@ const QString XDC_VERSION = QString::fromLatin1("MacDrawChem ") + VERSION;
 
 // math constant
 #define MOL_ARAD 57.29578
-#ifndef M_PI  // M_PI is usually defined on Unix, but not Windows
+#ifndef M_PI // M_PI is usually defined on Unix, but not Windows
 #define M_PI 3.14159246
 #endif
 
@@ -63,22 +64,22 @@ const QString XDC_VERSION = QString::fromLatin1("MacDrawChem ") + VERSION;
 #define MODE_DRAWLINE_DASH 210
 #define MODE_DRAWLINE_DASH_DRAWING 211
 
-#define MODE_DRAWLINE_UP  220
+#define MODE_DRAWLINE_UP 220
 #define MODE_DRAWLINE_UP_DRAWING 221
 
-#define MODE_DRAWLINE_DOWN  240
+#define MODE_DRAWLINE_DOWN 240
 #define MODE_DRAWLINE_DOWN_DRAWING 241
 
-#define MODE_DRAWWAVYLINE  250
+#define MODE_DRAWWAVYLINE 250
 #define MODE_DRAWWAVYLINE_DRAWING 251
 
-#define MODE_DRAWARROW  260
+#define MODE_DRAWARROW 260
 #define MODE_DRAWARROW_DRAWING 261
 
 #define MODE_DRAWCURVEARROW 270
 #define MODE_DRAWCURVEARROW_DRAWING 271
 
-#define MODE_DRAWBRACKET  280
+#define MODE_DRAWBRACKET 280
 #define MODE_DRAWBRACKET_DRAWING 281
 
 #define MODE_DRAWBEZIER 290
@@ -100,9 +101,9 @@ const QString XDC_VERSION = QString::fromLatin1("MacDrawChem ") + VERSION;
 #define MODE_TOOL_CALCEF 602
 #define MODE_TOOL_13CNMR 603
 #define MODE_TOOL_CALCEA 604
-#define MODE_TOOL_1HNMR  605
-#define MODE_TOOL_IR     606
-#define MODE_TOOL_NAME   607
+#define MODE_TOOL_1HNMR 605
+#define MODE_TOOL_IR 606
+#define MODE_TOOL_NAME 607
 #define MODE_TOOL_TOSMILES 608
 #define MODE_TOOL_FROMSMILES 609
 #define MODE_TOOL_CLEANUPMOL 610
@@ -169,13 +170,13 @@ enum bracketType {
 };
 
 // bracket types (Bracket::style)
-#define BRACKET_SQUARE  1
-#define BRACKET_CURVE   2
-#define BRACKET_BRACE   3
-#define BRACKET_BOX     4
+#define BRACKET_SQUARE 1
+#define BRACKET_CURVE 2
+#define BRACKET_BRACE 3
+#define BRACKET_BOX 4
 #define BRACKET_ELLIPSE 5
-#define BRACKET_CLOSEDSQUARE  6
-#define BRACKET_CIRCLE  7
+#define BRACKET_CLOSEDSQUARE 6
+#define BRACKET_CIRCLE 7
 #define BRACKET_BOX_SHADOW 8
 #define BRACKET_ELLIPSE_SHADOW 9
 #define BRACKET_SQUARE_SHADOW 10
@@ -289,11 +290,11 @@ enum symbolType {
 #define GROUP_CATALYST 4
 
 // output devices
-#define OUTPUT_SCREEN  1
-#define OUTPUT_IMAGE   2
+#define OUTPUT_SCREEN 1
+#define OUTPUT_IMAGE 2
 #define OUTPUT_PRINTER 3
-#define OUTPUT_EPS     4
-#define OUTPUT_SVG     5
+#define OUTPUT_EPS 4
+#define OUTPUT_SVG 5
 
 // Paintable::op Operation types
 /*  OBSOLETE
@@ -314,31 +315,31 @@ enum symbolType {
 
 // page setup
 #define PAGE_LETTER 1
-#define PAGE_LEGAL  2
-#define PAGE_A4     3
-#define PAGE_640    4
-#define PAGE_800    5
-#define PAGE_1024   6
+#define PAGE_LEGAL 2
+#define PAGE_A4 3
+#define PAGE_640 4
+#define PAGE_800 5
+#define PAGE_1024 6
 #define PAGE_CUSTOM 7
-#define PAGE_PORTRAIT  100
+#define PAGE_PORTRAIT 100
 #define PAGE_LANDSCAPE 200
 
 // CML stuff
 // track what tag(s) we're in (private int CMLParser::states)
 #define CML_MOLECULE 10
-#define CML_NONE   1
-#define CML_ATOM   2
-#define CML_BOND   3
+#define CML_NONE 1
+#define CML_ATOM 2
+#define CML_BOND 3
 #define CML_ATOMARRAY 4
 #define CML_BONDARRAY 5
-#define CDXML_COLORTABLE  100
-#define CDXML_FONTTABLE   101
-#define CDXML_PAGE        102
-#define CDXML_FRAGMENT    103
-#define CDXML_NODE        104
-#define CDXML_BOND        105
-#define CDXML_GRAPHIC     106
-#define CDXML_TEXT        107
+#define CDXML_COLORTABLE 100
+#define CDXML_FONTTABLE 101
+#define CDXML_PAGE 102
+#define CDXML_FRAGMENT 103
+#define CDXML_NODE 104
+#define CDXML_BOND 105
+#define CDXML_GRAPHIC 106
+#define CDXML_TEXT 107
 
 #endif // ifndef DEFS_H
 

@@ -9,25 +9,25 @@
 *****************************************************************************/
 
 #include <QApplication>
+#include <QLocale>
 #include <QString>
 #include <QTextStream>
-#include <QLocale>
-#include <QTranslator>
 #include <QTimer>
+#include <QTranslator>
 
 #include "application.h"
 #include "clipboard.h"
 #include "defs.h"
-#include "prefs.h"
 #include "dyk.h"
+#include "prefs.h"
 
 QString RingDir, HomeDir;
-QTextStream out( stdout );
+QTextStream out(stdout);
 Preferences preferences;
 
-void usage();                 // defined below
+void usage(); // defined below
 
-int main( int argc, char **argv )
+int main(int argc, char** argv)
 {
     int ae;
 
@@ -36,38 +36,38 @@ int main( int argc, char **argv )
     QString infile, outfile;
     bool loadflag = false, pngflag = false, quitflag = false, helpflag = false, versionflag = false, tflag = false, to3dflag = false;
 
-    for ( int c1 = 0; c1 < argc; c1++ ) {
-        cmds.append( argv[c1] );
+    for (int c1 = 0; c1 < argc; c1++) {
+        cmds.append(argv[c1]);
     }
-    if ( cmds.count() > 1 ) {
-        foreach ( QString arg, cmds ) {
+    if (cmds.count() > 1) {
+        foreach (QString arg, cmds) {
             qDebug() << arg << ":";
-            if ( arg == "-h" ) {
+            if (arg == "-h") {
                 helpflag = true;
                 continue;
             }
-            if ( arg == "--help" ) {
+            if (arg == "--help") {
                 helpflag = true;
                 continue;
             }
-            if ( arg == "-v" ) {
+            if (arg == "-v") {
                 versionflag = true;
                 continue;
             }
-            if ( arg == "--version" ) {
+            if (arg == "--version") {
                 versionflag = true;
                 continue;
             }
-            if ( arg == "-t" ) {
+            if (arg == "-t") {
                 tflag = true;
                 continue;
             }
-            if ( arg == "-png" ) {
+            if (arg == "-png") {
                 pngflag = true;
                 outfile = arg;
                 continue;
             }
-            if ( arg == "-3d" ) {
+            if (arg == "-3d") {
                 to3dflag = true;
                 outfile = arg;
                 continue;
@@ -77,24 +77,24 @@ int main( int argc, char **argv )
         }
     }
 
-    if ( helpflag )
+    if (helpflag)
         usage();
-    if ( versionflag ) {
+    if (versionflag) {
         out << XDC_VERSION << endl;
-        exit( 0 );
+        exit(0);
     }
 
-    QApplication a( argc, argv );
-
+    QApplication a(argc, argv);
+    /*
     // set library directory (RingDir = default RINGHOME)
     QString dname( RINGHOME );
     if ( dname.right( 1 ) != QString( "/" ) )
         dname.append( QString( "/" ) );
     //dname.append( "ring/" );
 
-    qInfo() << "appDirPath::" << QApplication::applicationDirPath();
-    QString altdname = QApplication::applicationDirPath();
-    if (altdname.contains("Contents/MacOS")) {
+    qInfo() << "appDirPath::" << QApplication::applicationDirPath();*/
+    QString appDirPath = QApplication::applicationDirPath();
+    /*if (altdname.contains("Contents/MacOS")) {
         dname = altdname.replace("Contents/MacOS","Contents/Resources");
         if ( dname.right( 1 ) != QString( "/" ) )
                 dname.append( QString( "/" ) );
@@ -105,83 +105,84 @@ int main( int argc, char **argv )
                 dname.append( QString( "/" ) );
         dname.append( "ring/" );
     }
-    qInfo() << "dname = " << dname;
-    RingDir = dname;
+    qInfo() << "dname = " << dname;*/
 
     // set home directory/pref file and fallback dir/pref file
 #ifdef UNIX
-    HomeDir = getenv( "HOME" );
+    HomeDir = getenv("HOME");
     QString cRingDir = HomeDir;
 
-    cRingDir.append( "/.xdrawchem/" );
-    preferences.setCustomRingDir( cRingDir );
+    cRingDir.append("/.xdrawchem/");
+    preferences.setCustomRingDir(cRingDir);
     HomeDir = HomeDir + "/.xdrawchemrc";
-    preferences.setSaveFile( HomeDir );
-    QFile f1( HomeDir );
+    preferences.setSaveFile(HomeDir);
+    QFile f1(HomeDir);
 
-    if ( f1.open( QIODevice::ReadOnly ) == false ) {
+    if (f1.open(QIODevice::ReadOnly) == false) {
         HomeDir = RingDir + "xdrawchemrc";
-        preferences.setFile( HomeDir, true );
+        preferences.setFile(HomeDir, true);
     } else {
         f1.close();
-        preferences.setFile( HomeDir, false );
+        preferences.setFile(HomeDir, false);
     }
-#else // Windows, Mac?
-    HomeDir = "xdrawchemrc";
-    preferences.setCustomRingDir( RingDir );
-    preferences.setSaveFile( HomeDir );
-    QFile f1( HomeDir );
+#endif
+#ifdef WIN32
+    RingDir = appDirPath + "/ring/";
+    HomeDir = appDirPath + "/xdrawchemrc";
+    preferences.setCustomRingDir(RingDir);
+    preferences.setSaveFile(HomeDir);
+    QFile f1(HomeDir);
 
-    if ( f1.open( QIODevice::ReadOnly ) == false ) {
+    if (f1.open(QIODevice::ReadOnly) == false) {
         HomeDir = RingDir + "xdrawchemrc";
-        preferences.setFile( HomeDir, true );
+        preferences.setFile(HomeDir, true);
     } else {
         f1.close();
-        preferences.setFile( HomeDir, false );
+        preferences.setFile(HomeDir, false);
     }
 #endif
 
-    if ( preferences.LoadPrefs() == false ) {
+    if (preferences.LoadPrefs() == false) {
         qWarning() << "Unable to load preferences file";
         preferences.Defaults();
     }
     // translation file for application strings
     QTranslator translator;
 
-    translator.load( QString::fromLatin1( "xdrawchem_" ) + QLocale::system().name(), RingDir );
-    a.installTranslator( &translator );
+    translator.load(QString::fromLatin1("xdrawchem_") + QLocale::system().name(), appDirPath);
+    a.installTranslator(&translator);
 
-    ApplicationWindow *mw = new ApplicationWindow;
+    ApplicationWindow* mw = new ApplicationWindow;
 
-    mw->setWindowTitle( QString( XDC_VERSION ) + QString( " - " ) + mw->tr( "untitled" ) );
-    if ( loadflag )
-        mw->load( infile );
+    mw->setWindowTitle(QString(XDC_VERSION) + QString(" - ") + mw->tr("untitled"));
+    if (loadflag)
+        mw->load(infile);
     mw->show();
-    if ( pngflag ) {
+    if (pngflag) {
         mw->ni_savefile = outfile;
         mw->ni_tflag = tflag;
-        QTimer::singleShot( 0, mw, SLOT( savePNG() ) );
+        QTimer::singleShot(0, mw, SLOT(savePNG()));
     }
-    if ( to3dflag ) {
+    if (to3dflag) {
         mw->ni_savefile = outfile;
         mw->ni_tflag = tflag;
-        QTimer::singleShot( 0, mw, SLOT( save3D() ) );
+        QTimer::singleShot(0, mw, SLOT(save3D()));
     }
 
-    if ( quitflag )
-        exit( 0 );              // exit if non-interactive mode.
+    if (quitflag)
+        exit(0); // exit if non-interactive mode.
 
-    a.connect( &a, SIGNAL( lastWindowClosed() ), &a, SLOT( quit() ) );
+    a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));
     mw->HideTextButtons();
 
-    if ( preferences.getDYK() ) {
+    if (preferences.getDYK()) {
         DYKDialog dyk1;
 
         dyk1.exec();
     }
 
     ae = a.exec();
-    if ( preferences.SavePrefs() == false ) {
+    if (preferences.SavePrefs() == false) {
         qWarning() << "Unable to save preferences file";
     }
     return ae;
@@ -199,7 +200,7 @@ void usage()
     out << "-h, --help:  Display this help" << endl;
     out << "-v, --version:  Display the version information" << endl;
 
-    exit( 0 );
+    exit(0);
 }
 
 // kate: tab-width 4; indent-width 4; space-indent on; replace-trailing-space-save on;

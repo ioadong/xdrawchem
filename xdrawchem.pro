@@ -1,6 +1,6 @@
 TEMPLATE = app
 TARGET = xdrawchem
-
+linux-g++{
 # edit to match your OB install
 exists(/usr/include/openbabel-2.0/openbabel/mol.h) {
 INCLUDEPATH += /usr/include/openbabel-2.0
@@ -27,26 +27,31 @@ error(OpenBabel was not found.  Edit xdrawchem.pro and add valid include and lib
 isEmpty(PREFIX) {
 PREFIX = /usr/local
 }
-
-DESTDIR = bin
 target.path = $${PREFIX}/$${DESTDIR}
 INSTALLS = target
-
-MOC_DIR = .moc
-UI_DIR = .ui
-OBJECTS_DIR = .obj
-
 # for includes and libs
 DEFINES += UNIX
 DEFINES += RINGHOME=\\\"$${PREFIX}/share/xdrawchem\\\"
-DEFINES += XDC_SERVER=\\\"http://www.woodsidelabs.com/chemistry\\\"
+
 ringdir.path = $${PREFIX}/share/xdrawchem
 ringdir.files = ring/*
 doc.path = $${PREFIX}/share/xdrawchem/doc
 doc.files = doc/*
 INSTALLS += ringdir doc
 QMAKE_CXXFLAGS_DEBUG += -O0 -g3
+}
+win32-msvc{
+CONFIG += WIN32
+INCLUDEPATH += E:/CodeLib/openbabel-vc/include
+INCLUDEPATH += E:/CodeLib/openbabel-vc/data
+LIBS += -LE:/CodeLib/openbabel-vc/lib -lopenbabel-2
 
+}
+DEFINES += XDC_SERVER=\\\"http://www.woodsidelabs.com/chemistry\\\"
+DESTDIR = bin
+MOC_DIR = .moc
+UI_DIR = .ui
+OBJECTS_DIR = .obj
 CONFIG += debug
 QT += xml network core widgets printsupport network gui
 
@@ -207,15 +212,15 @@ SOURCES = xdrawchem/application.cpp \
           xdrawchem/xruler.cpp
 
 TRANSLATIONS = translation/xdrawchem_da.ts \
-	translation/xdrawchem_dk.ts \
-	translation/xdrawchem_es.ts \
-	translation/xdrawchem_it.ts \
-	translation/xdrawchem_nl.ts \
-	translation/xdrawchem_pt_BR.ts \
-	translation/xdrawchem_de.ts \
-	translation/xdrawchem_en.ts \
-	translation/xdrawchem_fr.ts \
-	translation/xdrawchem_jp.ts \
-	translation/xdrawchem_pl.ts \
-	translation/xdrawchem_pt.ts
+    translation/xdrawchem_dk.ts \
+    translation/xdrawchem_es.ts \
+    translation/xdrawchem_it.ts \
+    translation/xdrawchem_nl.ts \
+    translation/xdrawchem_pt_BR.ts \
+    translation/xdrawchem_de.ts \
+    translation/xdrawchem_en.ts \
+    translation/xdrawchem_fr.ts \
+    translation/xdrawchem_jp.ts \
+    translation/xdrawchem_pl.ts \
+    translation/xdrawchem_pt.ts
 

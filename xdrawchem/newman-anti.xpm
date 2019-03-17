@@ -1,5 +1,5 @@
 /* XPM */
-static char * newman_anti_xpm[] = {
+static const char *newman_anti_xpm[] = {
 "57 60 2 1",
 " 	c None",
 ".	c #000000",
