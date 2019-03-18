@@ -3,28 +3,29 @@
 
 #include <QtDebug>
 
-#include <vector>
-#include <string>
-#include <sstream>
 #include <map>
+#include <sstream>
+#include <string>
+#include <vector>
 
-#include "render2d.h"
+#include "atom.h"
+#include "defs.h"
+#include "dpoint.h"
 #include "drawable.h"
 #include "molecule.h"
-#include "dpoint.h"
-#include "text.h"
-#include "atom.h"
+#include "openbabel/elements.h"
+#include "render2d.h"
 #include "ring.h"
-#include "setofrings.h"
 #include "sdg.h"
-#include "defs.h"
+#include "setofrings.h"
+#include "text.h"
 
 using namespace OpenBabel;
 
 // CleanUp(): Invoke SDG() to clean up structure
 void Molecule::CleanUp()
 {
-    SDG( true );
+    SDG(true);
 }
 
 // Structure Diagram Generation - add coordinates to connectivity
@@ -37,24 +38,24 @@ void Molecule::CleanUp()
 // 1) Ugi I et al., Journal of Chemical research (M), 1991, 2601-2689
 // 2) Christoph Steinbeck's Java implentation of above, JMDraw.
 //    http://jmdraw.sourceforge.net/
-void Molecule::SDG( bool coord )
+void Molecule::SDG(bool coord)
 {
     QRect bb1;
     QPoint center1, center2;
 
-    if ( coord == true ) {      // if coordinates exist, save center of bounding box
+    if (coord == true) { // if coordinates exist, save center of bounding box
         bb1 = BoundingBoxAll();
         center1 = bb1.center();
     }
     //DPoint *t2;
-    Atom *a1;
+    Atom* a1;
 
     // get unique points
     up = AllPoints();
-    QVector < Atom * >atoms( up.count() );
+    QVector<Atom*> atoms(up.count());
 
     // clear "hit" flag on all atoms
-    foreach ( tmp_pt, up )
+    foreach (tmp_pt, up)
         tmp_pt->hit = false;
     // find rings (esp. find aromaticity) - do after CopyTextToDPoint()
     MakeSSSR();
@@ -62,33 +63,33 @@ void Molecule::SDG( bool coord )
 
     // convert "up" to JMDraw-friendly Qlist<Atom>
     // rebuild neighbors list (usually mangled by MakeSSSR)
-    foreach ( tmp_pt, up ) {
+    foreach (tmp_pt, up) {
         tmp_pt->neighbors.clear();
-        foreach ( tmp_bond, bonds ) {
-            if ( tmp_bond->Find( tmp_pt ) == true ) {
-                tmp_pt->neighbors.append( tmp_bond->otherPoint( tmp_pt ) );
-                tmp_pt->bondorder[( tmp_pt->neighbors.count() - 1 )] = tmp_bond->Order();
+        foreach (tmp_bond, bonds) {
+            if (tmp_bond->Find(tmp_pt) == true) {
+                tmp_pt->neighbors.append(tmp_bond->otherPoint(tmp_pt));
+                tmp_pt->bondorder[(tmp_pt->neighbors.count() - 1)] = tmp_bond->Order();
             }
         }
     }
     // first copy all DPoints
     int c1, c2, refnum;
 
-    for ( c1 = 0; c1 < up.count(); c1++ ) {
-        tmp_pt = up.at( c1 );
-        a1 = new Atom( tmp_pt->element, tmp_pt->x, tmp_pt->y, tmp_pt->z );
+    for (c1 = 0; c1 < up.count(); c1++) {
+        tmp_pt = up.at(c1);
+        a1 = new Atom(tmp_pt->element, tmp_pt->x, tmp_pt->y, tmp_pt->z);
         a1->number = tmp_pt->serial;
         a1->degree = tmp_pt->neighbors.count();
-        qInfo() << c1 << "-degree-" << a1->degree ;
-        atoms.replace( c1, a1 );
+        qInfo() << c1 << "-degree-" << a1->degree;
+        atoms.replace(c1, a1);
     }
     // now build connectivity table
-    for ( c1 = 0; c1 < up.count(); c1++ ) {
-        tmp_pt = up.at( c1 );
-        a1 = atoms.at( c1 );
-        for ( c2 = 0; c2 < tmp_pt->neighbors.count(); c2++ ) {
-            refnum = tmp_pt->neighbors.at( c2 )->serial;
-            a1->nodeTable.replace( c2, atoms.at( refnum ) );
+    for (c1 = 0; c1 < up.count(); c1++) {
+        tmp_pt = up.at(c1);
+        a1 = atoms.at(c1);
+        for (c2 = 0; c2 < tmp_pt->neighbors.count(); c2++) {
+            refnum = tmp_pt->neighbors.at(c2)->serial;
+            a1->nodeTable.replace(c2, atoms.at(refnum));
             a1->bondTable[c2] = tmp_pt->bondorder[c2];
             a1->intnodeTable[c2] = refnum;
         }
@@ -118,18 +119,18 @@ void Molecule::SDG( bool coord )
     // pass to SDG class.
     class SDG sdg1;
     qInfo() << "SDG starting with atoms: " << atoms.size();
-    sdg1.setAtoms( atoms );
+    sdg1.setAtoms(atoms);
     //sdg1.setRings(s1);
-    sdg1.setBL( preferences.getBond_fixedlength() );
+    sdg1.setBL(preferences.getBond_fixedlength());
     sdg1.exec();
     atoms = sdg1.getAtoms();
 
     qInfo() << "SDG succeeded!";
 
     // convert atoms back to DPoint (essentially, just update x,y coordinates)
-    for ( c1 = 0; c1 < up.count(); c1++ ) {
-        tmp_pt = up.at( c1 );
-        a1 = atoms.at( c1 );
+    for (c1 = 0; c1 < up.count(); c1++) {
+        tmp_pt = up.at(c1);
+        a1 = atoms.at(c1);
         tmp_pt->x = a1->x;
         tmp_pt->y = a1->y;
     }
@@ -137,17 +138,17 @@ void Molecule::SDG( bool coord )
     bb1 = BoundingBoxAll();
     int xmove = 0, ymove = 0;
 
-    if ( coord == true ) {      // if coordinates existed, move back into place
+    if (coord == true) { // if coordinates existed, move back into place
         center2 = bb1.center();
         xmove = center1.x() - center2.x();
         ymove = center1.y() - center2.y();
-    } else {                    // move to top left of screen
-        if ( bb1.left() < 10 )
+    } else { // move to top left of screen
+        if (bb1.left() < 10)
             xmove = 10 - bb1.left();
-        if ( bb1.top() < 10 )
+        if (bb1.top() < 10)
             ymove = 10 - bb1.top();
     }
-    foreach ( tmp_pt, up ) {
+    foreach (tmp_pt, up) {
         tmp_pt->x += xmove;
         tmp_pt->y += ymove;
     }
@@ -157,27 +158,28 @@ void Molecule::SDG( bool coord )
 }
 
 // cheat: use Babel to make InChI strings...
-QString Molecule::ToInChI() {
-  std::istringstream istream( ToMDLMolfile().toLatin1().constData() );
-  std::ostringstream ostream;
-  
-  OBConversion Conv( &istream, &ostream );
-  OBFormat *pInFormat = 0, *pOutFormat = 0;
-  
-  pInFormat = Conv.FindFormat( "mol" );
-  pOutFormat = Conv.FindFormat( "inchi" );
-  
-  Conv.SetInAndOutFormats( pInFormat, pOutFormat );
-  //Conv.Convert();
-  OBMol mol;
-  Conv.Read(&mol);
-  Conv.Write(&mol);
-  
-  // convert the string into a terminated c string
-  
-  std::string s = ostream.str();
-  s[s.length() - 1] = '\0';
-  return ( QString( s.c_str() ) );
+QString Molecule::ToInChI()
+{
+    std::istringstream istream(ToMDLMolfile().toLatin1().constData());
+    std::ostringstream ostream;
+
+    OBConversion Conv(&istream, &ostream);
+    OBFormat *pInFormat = 0, *pOutFormat = 0;
+
+    pInFormat = Conv.FindFormat("mol");
+    pOutFormat = Conv.FindFormat("inchi");
+
+    Conv.SetInAndOutFormats(pInFormat, pOutFormat);
+    //Conv.Convert();
+    OBMol mol;
+    Conv.Read(&mol);
+    Conv.Write(&mol);
+
+    // convert the string into a terminated c string
+
+    std::string s = ostream.str();
+    s[s.length() - 1] = '\0';
+    return (QString(s.c_str()));
 }
 
 // cheat: use Babel to make SMILES strings.
@@ -189,7 +191,7 @@ QString Molecule::ToSMILES()
 
     qInfo() << molfile;
 
-    std::istringstream istream( ToMDLMolfile().toLatin1().constData() );
+    std::istringstream istream(ToMDLMolfile().toLatin1().constData());
     std::ostringstream ostream;
 
     /* obsolete?
@@ -200,13 +202,13 @@ QString Molecule::ToSMILES()
        fileFormat.WriteMolecule(ostream, myMol);
      */
 
-    OBConversion Conv( &istream, &ostream );
+    OBConversion Conv(&istream, &ostream);
     OBFormat *pInFormat = 0, *pOutFormat = 0;
 
-    pInFormat = Conv.FindFormat( "mol" );
-    pOutFormat = Conv.FindFormat( "smi" );
+    pInFormat = Conv.FindFormat("mol");
+    pOutFormat = Conv.FindFormat("smi");
 
-    Conv.SetInAndOutFormats( pInFormat, pOutFormat );
+    Conv.SetInAndOutFormats(pInFormat, pOutFormat);
     //Conv.Convert();
     OBMol mol;
     Conv.Read(&mol);
@@ -216,88 +218,88 @@ QString Molecule::ToSMILES()
 
     std::string s = ostream.str();
     s[s.length() - 1] = '\0';
-    return ( QString( s.c_str() ) );
+    return (QString(s.c_str()));
 }
 
 // convert InChI string to Molecule (using Babel!)
 // (Ideally, you should call this function just after creating)
-void Molecule::FromInChI( QString sm )
+void Molecule::FromInChI(QString sm)
 {
 }
 
 // convert InChI or SMILES string to Molecule
 // (Ideally, you should call this function just after creating)
-void Molecule::FromSMILES( QString sm )
+void Molecule::FromSMILES(QString sm)
 {
     qInfo() << "FromSMILES: " << sm;
     QString inputFormat = "smi";
-    if (sm.contains("InChI=")) { inputFormat = "inchi"; }
+    if (sm.contains("InChI=")) {
+        inputFormat = "inchi";
+    }
     QByteArray smArray = sm.toLatin1();
 
-    std::istringstream istream( smArray.constData() );        // build a stream on the string
+    std::istringstream istream(smArray.constData()); // build a stream on the string
 
     OBMol myMol;
     OBConversion conv;
-    OBFormat *format = conv.FindFormat( inputFormat.toLatin1() );
+    OBFormat* format = conv.FindFormat(inputFormat.toLatin1());
 
-    conv.SetInAndOutFormats( format, format );
+    conv.SetInAndOutFormats(format, format);
     myMol.Clear();
-    conv.Read( &myMol, &istream );
+    conv.Read(&myMol, &istream);
 
     // now convert the molecule into XDC's internal representation
 
-    OpenBabel::OBAtom * thisAtom;
+    OpenBabel::OBAtom* thisAtom;
 
-    std::vector < DPoint * >avec;
+    std::vector<DPoint*> avec;
 
     QString tmp_element, tmp_element_mask;
 
-    DPoint *thisDPoint;
+    DPoint* thisDPoint;
 
-    OpenBabel::OBElementTable etable;
+    //OpenBabel::OBElementTable etable;
 
-    std::vector < OpenBabel::OBNodeBase * >::iterator ait;
+    std::vector<OpenBabel::OBNodeBase*>::iterator ait;
 
-    std::map < OpenBabel::OBAtom *, DPoint * >hashit;
+    std::map<OpenBabel::OBAtom*, DPoint*> hashit;
     int i = 0; // this appears to be for debug
 
-    for ( thisAtom = myMol.BeginAtom( ait ); thisAtom; thisAtom = myMol.NextAtom( ait ) ) {
+    for (thisAtom = myMol.BeginAtom(ait); thisAtom; thisAtom = myMol.NextAtom(ait)) {
 
-        qInfo() << "Adding OBAtom: " << i++ << " of element#: " <<
-          thisAtom->GetAtomicNum() << " type: " <<
-          etable.GetSymbol(thisAtom->GetAtomicNum()) ;
+        qInfo() << "Adding OBAtom: " << i++ << " of element#: " << thisAtom->GetAtomicNum() << " type: " << OBElements::GetSymbol(thisAtom->GetAtomicNum());
         thisDPoint = new DPoint;
-        tmp_element = etable.GetSymbol( thisAtom->GetAtomicNum() );
+        tmp_element = OBElements::GetSymbol(thisAtom->GetAtomicNum());
 
         tmp_element_mask = tmp_element;
-        tmp_element_mask.fill( ' ' );   // fix the mask characters
+        tmp_element_mask.fill(' '); // fix the mask characters
 
         thisDPoint->element = tmp_element;
         thisDPoint->elementmask = tmp_element_mask;
 
-        if ( tmp_element != "C" ) {
-            Text *nt = new Text( r );
+        if (tmp_element != "C") {
+            Text* nt = new Text(r);
 
-            nt->setPoint( thisDPoint );
-            nt->setJustify( JUSTIFY_CENTER );
-            nt->Highlight( false );
-            nt->setText( tmp_element );
-            labels.append( nt );
+            nt->setPoint(thisDPoint);
+            nt->setJustify(JUSTIFY_CENTER);
+            nt->Highlight(false);
+            nt->setText(tmp_element);
+            labels.append(nt);
         }
 
-        avec.push_back( thisDPoint );
+        avec.push_back(thisDPoint);
 
         hashit[thisAtom] = thisDPoint;
     }
 
-    OpenBabel::OBBond * thisBond;
+    OpenBabel::OBBond* thisBond;
 
-    std::vector < OpenBabel::OBEdgeBase * >::iterator bit;
-    for ( thisBond = myMol.BeginBond( bit ); thisBond; thisBond = myMol.NextBond( bit ) ) {
-        addBond( hashit[thisBond->GetBeginAtom()], hashit[thisBond->GetEndAtom()], 1, thisBond->GetBondOrder(), QColor( 0, 0, 0 ), true );
+    std::vector<OpenBabel::OBEdgeBase*>::iterator bit;
+    for (thisBond = myMol.BeginBond(bit); thisBond; thisBond = myMol.NextBond(bit)) {
+        addBond(hashit[thisBond->GetBeginAtom()], hashit[thisBond->GetEndAtom()], 1, thisBond->GetBondOrder(), QColor(0, 0, 0), true);
     }
     qInfo() << "Before SDG, Atoms: " << AllPoints().size() << ", Bonds: " << bonds.size();
-    SDG( false );               // generate structure coordinates
+    SDG(false); // generate structure coordinates
 }
 
 //
@@ -337,28 +339,28 @@ void Molecule::FromSMILES(QString sm) {
       // extract letter token
       // look for single-letter aromatic
       if (sm[0].toLower() == sm[0]) {
-	tmp_token.append(sm.left(1));
-	sm.remove(0,1);
+    tmp_token.append(sm.left(1));
+    sm.remove(0,1);
       } else {
-	if ( (sm[1].toLower() == sm[1]) &&
-	     (sm[1].isLetter()) ) { // lowercase; two-letter symbol
-	  tmp_token.append(sm.left(2));
-	  sm.remove(0,2);
-	} else { //
-	  tmp_token.append(sm.left(1));
-	  sm.remove(0,1);
-	}
+    if ( (sm[1].toLower() == sm[1]) &&
+         (sm[1].isLetter()) ) { // lowercase; two-letter symbol
+      tmp_token.append(sm.left(2));
+      sm.remove(0,2);
+    } else { //
+      tmp_token.append(sm.left(1));
+      sm.remove(0,1);
+    }
       }
       // extract ring closure numbers
       if (sm.length() > 0) {
-	do {
-	  if (sm[0].isNumber()) {
-	    tmp_token.append(sm.left(1));
-	    sm.remove(0,1);
-	  } else {
-	    break;
-	  }
-	} while (sm.length() > 0);
+    do {
+      if (sm[0].isNumber()) {
+        tmp_token.append(sm.left(1));
+        sm.remove(0,1);
+      } else {
+        break;
+      }
+    } while (sm.length() > 0);
       }
       smilesTokens.append(tmp_token);
     }
@@ -388,8 +390,8 @@ void Molecule::FromSMILES(QString sm) {
   bool aromatic = false, flag = false;
 
   for ( QStringList::Iterator it = smilesTokens.begin();
-	it != smilesTokens.end();
-	++it ) {
+    it != smilesTokens.end();
+    ++it ) {
     prev_token = tmp_token;
     tmp_token = (*it).toLatin1();
 
@@ -462,20 +464,20 @@ void Molecule::FromSMILES(QString sm) {
     do {
       flag = false;
       if (tmp_token.at(tmp_token.length() - 1).isNumber()) {
-	int ringnum = tmp_token.right(1).toInt();
-	flag = true;
-	if (ring_array_status[ringnum] == false) { // save this atom
-	  ring_closure_array.replace(ringnum, new_pt);
-	  ring_array_status[ringnum] = true;
-	} else { // do ring closure
-	  tmp_pt = ring_closure_array.at(ringnum);
-	  if (tmp_pt->aromatic && new_pt->aromatic)
-	    addBond(tmp_pt, new_pt, 1, 4, QColor(0,0,0), true);
-	  else
-	    addBond(tmp_pt, new_pt, 1, 1, QColor(0,0,0), true);
-	  ring_array_status[ringnum] = false;
-	}
-	tmp_token.remove(tmp_token.length() - 1, 1);
+    int ringnum = tmp_token.right(1).toInt();
+    flag = true;
+    if (ring_array_status[ringnum] == false) { // save this atom
+      ring_closure_array.replace(ringnum, new_pt);
+      ring_array_status[ringnum] = true;
+    } else { // do ring closure
+      tmp_pt = ring_closure_array.at(ringnum);
+      if (tmp_pt->aromatic && new_pt->aromatic)
+        addBond(tmp_pt, new_pt, 1, 4, QColor(0,0,0), true);
+      else
+        addBond(tmp_pt, new_pt, 1, 1, QColor(0,0,0), true);
+      ring_array_status[ringnum] = false;
+    }
+    tmp_token.remove(tmp_token.length() - 1, 1);
       }
     } while (flag == true);
   }
