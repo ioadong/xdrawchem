@@ -42,13 +42,20 @@ QMAKE_CXXFLAGS_DEBUG += -O0 -g3
 }
 win32-msvc{
 CONFIG += WIN32
+DESTDIR = bin
 INCLUDEPATH += E:/CodeLib/openbabel-vc/include
 INCLUDEPATH += E:/CodeLib/openbabel-vc/data
 LIBS += -LE:/CodeLib/openbabel-vc/lib -lopenbabel-2
 
 }
-DEFINES += XDC_SERVER=\\\"http://www.woodsidelabs.com/chemistry\\\"
-DESTDIR = bin
+win32-g++{
+DESTDIR = f:/msys64/mingw64/bin
+CONFIG += WIN32
+INCLUDEPATH += E:/CodeLib/openbabel-mingw/include
+INCLUDEPATH += E:/CodeLib/openbabel-mingw/data
+LIBS += -LE:/CodeLib/openbabel-mingw/lib -lopenbabel
+}
+
 MOC_DIR = .moc
 UI_DIR = .ui
 OBJECTS_DIR = .obj
