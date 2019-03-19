@@ -16,5 +16,7 @@ win32-msvc{
 }
 
 QT += xml network core widgets printsupport network gui
+INCLUDEPATH += include
+INCLUDEPATH += resource
 include(source.pri)
 

@@ -16,28 +16,28 @@
 class QComboBox;
 class QTextBrowser;
 class QUrl;
+extern QString resourceDir;
 
-class HelpWindow : public QMainWindow
-{
+class HelpWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    HelpWindow( const QString& home_,  const QString& path, QWidget* parent = 0 );
+    HelpWindow(const QString& home_, const QString& path, QWidget* parent = 0);
     ~HelpWindow();
 
 private slots:
-    void setBackwardAvailable( bool );
-    void setForwardAvailable( bool );
+    void setBackwardAvailable(bool);
+    void setForwardAvailable(bool);
 
-    void sourceChanged(const QUrl &);
+    void sourceChanged(const QUrl&);
     void about();
     void print();
 
-    void pathSelected( const QString & );
+    void pathSelected(const QString&);
 
 private:
     QTextBrowser* browser;
-    QComboBox *pathCombo;
+    QComboBox* pathCombo;
     QAction *backwardAction, *forwardAction, *homeAction;
     QString selectedURL;
 };
@@ -45,4 +45,3 @@ private:
 #endif
 
 // kate: tab-width 4; indent-width 4; space-indent on; replace-trailing-space-save on;
-

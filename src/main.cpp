@@ -21,7 +21,10 @@
 #include "dyk.h"
 #include "prefs.h"
 
-QString RingDir, HomeDir;
+QString RingDir;
+QString HomeDir;
+QString templateDir;
+QString resourceDir;
 QTextStream out(stdout);
 Preferences preferences;
 
@@ -108,7 +111,7 @@ int main(int argc, char** argv)
     qInfo() << "dname = " << dname;*/
 
     // set home directory/pref file and fallback dir/pref file
-#ifdef UNIX
+#ifdef LINUX
     HomeDir = getenv("HOME");
     QString cRingDir = HomeDir;
 
@@ -129,6 +132,8 @@ int main(int argc, char** argv)
 #ifdef WIN32
     RingDir = appDirPath + "/ring/";
     HomeDir = appDirPath + "/xdrawchemrc";
+    templateDir = appDirPath + "/template/";
+    resourceDir = appDirPath + "/resource/";
     preferences.setCustomRingDir(RingDir);
     preferences.setSaveFile(HomeDir);
     QFile f1(HomeDir);

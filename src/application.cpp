@@ -47,9 +47,6 @@
 #include "xdc_toolbutton.h"
 #include "xruler.h"
 
-// main window icon
-//#include "xdc.xpm"
-
 // top toolbar
 #include "copytool.xpm"
 #include "cuttool.xpm"
@@ -121,7 +118,7 @@ ApplicationWindow::ApplicationWindow()
     setFont(preferences.getMainFont());
 
     // new, fancy PNG icon
-    setWindowIcon(QPixmap(RingDir + "xdrawchem-icon.png"));
+    setWindowIcon(QPixmap(resourceDir + "xdrawchem-icon.png"));
 
     //OBGetFilters();
 
